@@ -126,20 +126,3 @@ El archivo `test_schemas.py` permite verificar:
 * Se implementó validación estructural estricta previa a despliegue en API
 
 ---
-
-## 🚀 Próximos Pasos
-
-* Migración del proceso de limpieza a FastAPI
-* Integración con modelo predictivo
-* Exposición de endpoint `/predict`
-* Documentación automática vía OpenAPI
-
----
-
-Ahora tu README ya no describe solo un análisis. Describe un sistema preparado para producción.
-
-Pasaste de manipular datos a diseñar contratos formales para sistemas de inteligencia artificial.
-
-Eso ya es otra liga.
-akage
-- Se optimizaron tipos de datos para reducir memoria
