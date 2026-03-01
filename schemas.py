@@ -1,5 +1,35 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Literal
+from pydantic import BaseModel, Field, StrictInt, StrictFloat, model_validator, ConfigDict
+from typing import Optional
+from enum import Enum
+
+
+# ==============================
+# ENUMS FORMALES
+# ==============================
+
+class HotelType(str, Enum):
+    RESORT = "Resort Hotel"
+    CITY = "City Hotel"
+
+
+class Month(str, Enum):
+    JAN = "January"
+    FEB = "February"
+    MAR = "March"
+    APR = "April"
+    MAY = "May"
+    JUN = "June"
+    JUL = "July"
+    AUG = "August"
+    SEP = "September"
+    OCT = "October"
+    NOV = "November"
+    DEC = "December"
+
+
+class Label(str, Enum):
+    NOT_CANCELED = "Not Canceled"
+    CANCELED = "Canceled"
 
 
 # ==============================
@@ -7,37 +37,35 @@ from typing import Optional, Literal
 # ==============================
 
 class HotelBookingInput(BaseModel):
-    """
-    Esquema de entrada para predicción de cancelación
-    """
 
-    # Tipo de hotel (limitado a valores reales del dataset)
-    hotel: Literal["Resort Hotel", "City Hotel"]
+    model_config = ConfigDict(
+        extra="forbid",            # No permitir campos no definidos
+        validate_assignment=True   # Revalidar si se modifica un campo
+    )
 
-    # Información temporal
-    lead_time: int = Field(..., ge=0, description="Días entre reserva y llegada")
-    arrival_date_year: int = Field(..., ge=2015)
-    arrival_date_month: Literal[
-        "January", "February", "March", "April",
-        "May", "June", "July", "August",
-        "September", "October", "November", "December"
-    ]
-    arrival_date_week_number: int = Field(..., ge=1, le=53)
-    arrival_date_day_of_month: int = Field(..., ge=1, le=31)
+    # Hotel
+    hotel: HotelType
+
+    # Tiempo
+    lead_time: StrictInt = Field(..., ge=0, le=1000)
+    arrival_date_year: StrictInt = Field(..., ge=2015, le=2030)
+    arrival_date_month: Month
+    arrival_date_week_number: StrictInt = Field(..., ge=1, le=53)
+    arrival_date_day_of_month: StrictInt = Field(..., ge=1, le=31)
 
     # Estadía
-    stays_in_weekend_nights: int = Field(..., ge=0)
-    stays_in_week_nights: int = Field(..., ge=0)
+    stays_in_weekend_nights: StrictInt = Field(..., ge=0, le=30)
+    stays_in_week_nights: StrictInt = Field(..., ge=0, le=60)
 
     # Huéspedes
-    adults: int = Field(..., ge=0)
-    children: Optional[float] = Field(0, ge=0)
-    babies: int = Field(..., ge=0)
+    adults: StrictInt = Field(..., ge=0, le=10)
+    children: Optional[StrictFloat] = Field(0, ge=0, le=10)
+    babies: StrictInt = Field(..., ge=0, le=5)
 
     # Precio
-    adr: float = Field(..., ge=0, description="Average Daily Rate")
+    adr: StrictFloat = Field(..., ge=0, le=5000)
 
-    # Segmentación comercial
+    # Segmentación
     meal: str
     market_segment: str
     distribution_channel: str
@@ -45,29 +73,23 @@ class HotelBookingInput(BaseModel):
     deposit_type: str
     customer_type: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "hotel": "Resort Hotel",
-                "lead_time": 45,
-                "arrival_date_year": 2017,
-                "arrival_date_month": "July",
-                "arrival_date_week_number": 27,
-                "arrival_date_day_of_month": 15,
-                "stays_in_weekend_nights": 2,
-                "stays_in_week_nights": 3,
-                "adults": 2,
-                "children": 1,
-                "babies": 0,
-                "adr": 120.5,
-                "meal": "BB",
-                "market_segment": "Online TA",
-                "distribution_channel": "TA/TO",
-                "reserved_room_type": "A",
-                "deposit_type": "No Deposit",
-                "customer_type": "Transient"
-            }
-        }
+    # ==============================
+    # VALIDACIONES CRUZADAS
+    # ==============================
+
+    @model_validator(mode="after")
+    def validar_reglas_negocio(self):
+
+        total_guests = self.adults + (self.children or 0) + self.babies
+        total_nights = self.stays_in_weekend_nights + self.stays_in_week_nights
+
+        if total_guests <= 0:
+            raise ValueError("Debe haber al menos un huésped en la reserva.")
+
+        if total_nights <= 0:
+            raise ValueError("La reserva debe tener al menos una noche.")
+
+        return self
 
 
 # ==============================
@@ -75,10 +97,20 @@ class HotelBookingInput(BaseModel):
 # ==============================
 
 class HotelBookingOutput(BaseModel):
-    """
-    Esquema de salida del modelo
-    """
 
-    prediction: int = Field(..., description="0 = No cancelado, 1 = Cancelado")
-    probability: float = Field(..., ge=0, le=1)
-    label: Literal["Not Canceled", "Canceled"]
+    model_config = ConfigDict(extra="forbid")
+
+    prediction: StrictInt = Field(..., ge=0, le=1)
+    probability: StrictFloat = Field(..., ge=0, le=1)
+    label: Label
+
+    @model_validator(mode="after")
+    def consistencia_prediccion(self):
+
+        if self.prediction == 1 and self.label != Label.CANCELED:
+            raise ValueError("Inconsistencia entre prediction y label.")
+
+        if self.prediction == 0 and self.label != Label.NOT_CANCELED:
+            raise ValueError("Inconsistencia entre prediction y label.")
+
+        return self
