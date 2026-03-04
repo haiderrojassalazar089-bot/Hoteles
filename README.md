@@ -243,9 +243,9 @@ Estas interfaces permiten:
 
 * Validar contratos de datos
 
- Validación y Robustez
- 
 ---
+
+## Validación y Robustez
 
 La API se apoya en los esquemas definidos en schemas.py, lo que garantiza:
 
