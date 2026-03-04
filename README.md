@@ -212,7 +212,7 @@ Esta página está implementada usando HTML + CSS embebido, sin dependencias ext
 * Exportación del dataset limpio a disco
 ---
 
-##GET /limpieza
+## GET /limpieza
 
 Consultar resultado de la limpieza
 
