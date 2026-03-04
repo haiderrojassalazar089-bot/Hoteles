@@ -127,13 +127,14 @@ El archivo `test_schemas.py` permite verificar:
 
 ---
 
- Implementación de la API (FastAPI)
+
+## Implementación de la API (FastAPI)
 
 Como extensión natural del proceso de análisis, limpieza y validación de datos, el proyecto incorpora una API desarrollada con FastAPI, cuyo objetivo es automatizar y exponer el pipeline de EDA y limpieza de datos de manera estructurada y reutilizable.
 
 Esta API está diseñada como base para una futura etapa de inferencia y despliegue de modelos predictivos, asegurando desde el inicio contratos de datos claros y validaciones estrictas.
 
- Objetivo de la API
+Objetivo de la API
 
 La API permite:
 
@@ -146,8 +147,9 @@ La API permite:
 * Consultar el estado del proceso de limpieza
 
 * Servir como capa intermedia entre datos crudos y modelos predictivos
+---
 
- Construcción de la API
+## Construcción de la API
 
 La API fue construida siguiendo principios de diseño limpio y modular:
 
@@ -166,6 +168,7 @@ Separación clara entre:
 * validación
 
 * orquestación
+---
 
 El archivo main.py actúa como orquestador, conectando los distintos módulos del proyecto sin duplicar lógica.
 
@@ -183,8 +186,10 @@ La API incluye una landing page personalizada accesible desde la ruta raíz (/),
 
 Esta página está implementada usando HTML + CSS embebido, sin dependencias externas.
 
- Endpoints Disponibles
-GET /
+---
+## Endpoints Disponibles
+
+## GET /
 
 * Landing page de presentación
 
@@ -192,7 +197,7 @@ GET /
 
 * No forma parte del esquema OpenAPI
 
-POST /limpieza
+## POST /limpieza
 
 * Ejecutar pipeline de limpieza de datos
 
@@ -205,8 +210,9 @@ POST /limpieza
 * Limpieza avanzada
 
 * Exportación del dataset limpio a disco
+---
 
-GET /limpieza
+##GET /limpieza
 
 Consultar resultado de la limpieza
 
@@ -216,7 +222,9 @@ Evita ejecuciones innecesarias del pipeline
 
 Si el archivo no existe, retorna un error controlado (404).
 
- Documentación Automática
+---
+
+## Documentación Automática
 
 FastAPI genera automáticamente documentación interactiva:
 
@@ -235,6 +243,8 @@ Estas interfaces permiten:
 * Validar contratos de datos
 
  Validación y Robustez
+ 
+---
 
 La API se apoya en los esquemas definidos en schemas.py, lo que garantiza:
 
@@ -246,7 +256,7 @@ La API se apoya en los esquemas definidos en schemas.py, lo que garantiza:
 
 * Preparación directa para consumo por modelos de ML
 
- Preparación para Fases Futuras
+## Preparación para Fases Futuras
 
 Esta API deja preparado el proyecto para:
 
