@@ -168,11 +168,12 @@ Separación clara entre:
 * validación
 
 * orquestación
----
 
 El archivo main.py actúa como orquestador, conectando los distintos módulos del proyecto sin duplicar lógica.
 
- Landing Page (Presentación)
+---
+
+## Landing Page (Presentación)
 
 La API incluye una landing page personalizada accesible desde la ruta raíz (/), diseñada para:
 
@@ -214,13 +215,13 @@ Esta página está implementada usando HTML + CSS embebido, sin dependencias ext
 
 ## GET /limpieza
 
-Consultar resultado de la limpieza
+* Consultar resultado de la limpieza
 
-Verifica si el archivo limpio ya fue generado
+* Verifica si el archivo limpio ya fue generado
 
-Evita ejecuciones innecesarias del pipeline
+* Evita ejecuciones innecesarias del pipeline
 
-Si el archivo no existe, retorna un error controlado (404).
+* Si el archivo no existe, retorna un error controlado (404).
 
 ---
 
@@ -268,4 +269,3 @@ Esta API deja preparado el proyecto para:
 
 * Consumo por aplicaciones externas
 
-Si quieres, en el próximo mensaje puedo ay
